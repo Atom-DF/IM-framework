@@ -13,6 +13,7 @@ import plotly.graph_objects as go
 from itertools import zip_longest
 from time import time
 
+
 class TestSuite:
 
     def __init__(self, params = "parameters.json"):
@@ -38,6 +39,7 @@ class TestSuite:
                     result.simulate()
                     results_on_r.append(result.graph)
                 influence_average_num += self.R_stats(results_on_r)
+            print(str(seedsetsize) + ": " + str(influence_average_num/parameters["NumGraphs"]))
             influence_average.append(influence_average_num/parameters["NumGraphs"])
         self.store(influence_average, "Influence_average")
 
