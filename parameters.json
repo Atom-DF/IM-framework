@@ -3,7 +3,7 @@
   {
     "IC":
     {
-      "Propagation" : 0.3
+      "Propagation" : 0.2
     }
   },
   "Heuristics": "Random",
