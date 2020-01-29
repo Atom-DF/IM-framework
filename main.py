@@ -1,5 +1,5 @@
 from graph_tool.all import *
-from numpy.random import ranf, randint
+from numpy.random import ranf, randint, randn
 from Model.Model import Model
 from Model.IndependantCascade import IndependantCascade
 from Heuristic.Heuristic import Heuristic
@@ -7,6 +7,9 @@ from Heuristic.Random import Random
 from Heuristic.DegreePriority import DegreePriority
 from TestSuite.TestSuite import TestSuite
 import json
+
+import plotly.graph_objects as go
+
 
 # TEMP
 size = 15000
@@ -39,12 +42,6 @@ def stats(model: Model, heuristic: Heuristic, graph: Graph, seed_set_size: int, 
         result = model(graph.copy(), heuristic, seed_set_size)
         result.simulate()
         results.append(result.graph)
-        # g = GraphView(result.graph, vfilt=lambda v: result.graph.vertex_properties["active"][v] > 0)
-        # infected_number = len(g.get_vertices())
-        # infected_percentage = 100 * infected_number / (len(result.graph.get_vertices()))
-        # print(infected_number)
-        # print(infected_percentage)
-
     # Stats !
     total = list()
     num_infected = 0
@@ -60,6 +57,9 @@ def stats(model: Model, heuristic: Heuristic, graph: Graph, seed_set_size: int, 
     print(total)
     print(num_infected/R)
     print(per_infected/R)
+
+
+
 
 # stats(IndependantCascade, Random, gen_graph(size, density), 20, 50)
 TestSuite()
