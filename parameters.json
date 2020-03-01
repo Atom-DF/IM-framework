@@ -1,16 +1,31 @@
 {
-  "Models":
-  {
-    "IC":
-    {
-      "Propagation" : 0.2
+    "Models": {
+        "Name": "IC",
+        "Propagation": 0.01
+    },
+    "Heuristics": "Random",
+    "Graphs": {
+        "Generation": "SF",
+        "Cardinality": 10000,
+        "Gamma": 1,
+        "Out-degree": 3
+    },
+    "R": 20,
+    "NumGraphs": 10,
+    "SeedSetSize": [
+        10,
+        20,
+        30,
+        40,
+        50
+    ],
+    "Observable": {
+        "Problem": "Total",
+        "Sample": {
+            "Nodes": "Random",
+            "NProbability": 0.9,
+            "Edges": "Total",
+            "EProbability": 0.4
+        }
     }
-  },
-  "Heuristics": "Random",
-  "Graphs": {
-    "Cardinality" : 30000
-  },
-  "R": 500,
-  "NumGraphs" : 10,
-  "SeedSetSize" : [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40, 42, 44, 46, 48, 50]
 }

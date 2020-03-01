@@ -5,8 +5,8 @@ from numpy.random import ranf, randint
 
 class IndependantCascade(Model):
 
-    def __init__(self, graph: Graph = None, heuristic: Callable = None, seed_set_size: int = None) -> None:
-        super(IndependantCascade, self).__init__(graph, heuristic, seed_set_size)
+    def __init__(self, graph: Graph = None, seed_set = None) -> None:
+        super(IndependantCascade, self).__init__(graph, seed_set)
 
         # Default values for generating default graphs
         self._size = 1000
@@ -14,6 +14,8 @@ class IndependantCascade(Model):
 
     def _simulate(self) -> Graph:
         g = self.graph
+        # print(g.num_vertices())
+        # print(g.num_edges())
         t = 1
         g_ = GraphView(g, vfilt=lambda v: g.vertex_properties["active"][v] == t)
         # print("START")
@@ -43,7 +45,7 @@ class IndependantCascade(Model):
 
         # insert some random links
         for s, t in zip(randint(0, size, density), randint(0, size, density)):
-            e = g.add_edge(g.vertex(s), g.vertex(t))
+            g.add_edge(g.vertex(s), g.vertex(t))
 
         weight = g.new_edge_property("double", vals= ranf(size) if (propagation is None) else [propagation for i in range(density)])
         g.edge_properties["weight"] = weight

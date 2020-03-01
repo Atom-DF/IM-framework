@@ -2,11 +2,13 @@ from graph_tool.all import *
 from typing import Callable
 from .Model import Model
 from numpy.random import ranf, randint
+from numpy import sum, vectorize
 
-class IndependantCascade(Model):
+
+class LinearThreshold(Model):
 
     def __init__(self, graph: Graph = None, heuristic: Callable = None, seed_set_size: int = None) -> None:
-        super(IndependantCascade, self).__init__(graph, heuristic, seed_set_size)
+        super(LinearThreshold, self).__init__(graph, heuristic, seed_set_size)
 
         # Default values for generating default graphs
         self._size = 1000
@@ -14,24 +16,28 @@ class IndependantCascade(Model):
 
     def _simulate(self) -> Graph:
         g = self.graph
+        t = 1
+        g_ = GraphView(g, vfilt=lambda v: g.vertex_properties["active"][v] == t)
+        while g_.num_vertices() != 0:
+            # print(g_.num_vertices())
+            for n in g_.vertices():
+                # Go through the neighboors
+                v = g.vertex(n)
+                for n_neighbour in v.out_neighbors():
+                    # dont calculate anything if its activated already
+                    if g.vertex_properties["active"][n_neighbour] != 0:
+                        continue
+                    # sum the weight of all its activated neighboors
+                    # check if you need to activate it
+                    active_neighbours = g_.get_out_neighbors(n_neighbour, [g.vertex_properties["active"]])[:, 0]
+                    test = vectorize(lambda x: g.edge_properties["weight"][g.edge(n_neighbour, x)])
+                    activation_force = sum(test(active_neighbours))
 
-        # Go through all of the inactive nodes.
-        # activate them if needed
-        # if none are activated then stop
-
-        # t = 1
-        # g_ = GraphView(g, vfilt=lambda v: g.vertex_properties["active"][v] == 0)
-        # while g_.num_vertices() != 0:
-        #     for n in g_.vertices():
-        #         # Go through the neighboors
-        #         v = g.vertex(n)
-        #         for e_neighbour, n_neighbour in zip(v.out_edges(), v.out_neighbors()):
-        #             # Check if the node is activated and make sure not to give it a second life
-        #             if g.edge_properties["weight"][e_neighbour] > ranf(1) \
-        #                     and g.vertex_properties["active"][n_neighbour] == 0:
-        #                 g.vertex_properties["active"][n_neighbour] = t + 1
-        #     t += 1
-        #     g_ = GraphView(g, vfilt=lambda v: g.vertex_properties["active"][v] == 0)
+                    if g.vertex_properties["threshold"][n_neighbour] < activation_force:
+                        g.vertex_properties["active"][n_neighbour] = t + 1
+            t += 1
+            g_ = GraphView(g, vfilt=lambda v: g.vertex_properties["active"][v] == t)
+        # print("END")
         return g
 
     def _generate_default_graph(self) -> None:
