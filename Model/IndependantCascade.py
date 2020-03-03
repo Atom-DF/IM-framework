@@ -20,7 +20,6 @@ class IndependantCascade(Model):
         g_ = GraphView(g, vfilt=lambda v: g.vertex_properties["active"][v] == t)
         # print("START")
         while g_.num_vertices() != 0:
-            # print(g_.num_vertices())
             for n in g_.vertices():
                 # Go through the neighboors
                 v = g.vertex(n)

@@ -36,9 +36,9 @@ class TIM(Heuristic):
         return seed_set
 
     @staticmethod
-    @timer2
+    # @timer2
     def parameter_estimation(G, k, l):
-        @timer2
+        # @timer2
         def K(R):
             m = G.num_edges()
             # Go over every set and calculate K(set)
@@ -59,7 +59,7 @@ class TIM(Heuristic):
 
 
     @staticmethod
-    @timer2
+    # @timer2
     def node_selection(G, k, theta):
         # generate theta random RR sets and insert them in R
         R = TIM.rr_generation(G, theta)
@@ -71,7 +71,7 @@ class TIM(Heuristic):
         return S
 
     @staticmethod
-    @timer2
+    # @timer2
     def rr_generation(G: Graph, theta):
         R = set()
         for i in range(theta):

@@ -41,38 +41,43 @@ class TestSuite:
             exit(-1)
 
         try:
+            print("using "+self.parameters["Heuristics"])
             heuristic = heuristics[self.parameters["Heuristics"]]
         except Exception as e:
             print("Could not find the heuristic in the map:" + self.parameters["Heuristics"])
             exit(-1)
 
+        # Get the initial graph
+        self.graph = self.gen_graph()
 
+        # Model Partial Obversability
+        graph = self.model_PO(self.graph.copy())
+
+        # used for stats
         influence_average = []
         for seedsetsize in self.parameters["SeedSetSize"]:
-            influence_average_num = 0
-            for NumGraphs in range(self.parameters["NumGraphs"]):
-                graph = self.gen_graph()
-                # print(graph.num_vertices())
-                # print(graph.num_edges())
-                # Store the results of R simulation on a randomly generated graph
-                results_on_r = []
+            # Used for stats
+            results_on_r = []
 
-                # Decide what to show to the heuristic
-                graph_copy = self.model_PO(graph.copy())
+            # Copy of the graph for the run
+            graph_copy = graph.copy()
 
-                # Run the heuristic on it
-                seed_set = heuristic.generate(graph_copy, seedsetsize)
+            # Run the heuristic on it
+            seed_set = heuristic.generate(graph_copy, seedsetsize)
+            for i in range(self.parameters["R"]):
+                # Use a blank graph, the changes from the heuristic are kept in this version
+                graph_copy_R = graph_copy.copy()
+                # Run the model on the original graph (all changes made by the heuristic are passed onto graph_copy_R)
+                result = model(graph_copy_R, seed_set)
 
-                for i in range(self.parameters["R"]):
-                    # Run the model on the original graph (all changes made by the heuristic are passed onto graph_copy)
-                    result = model(graph_copy, seed_set)
-                    # Run the simulation
-                    result.simulate()
-                    # Some stats
-                    results_on_r.append(result.graph)
-                influence_average_num += self.R_stats(results_on_r)
-            print(str(seedsetsize) + ": " + str(influence_average_num/self.parameters["NumGraphs"]))
-            influence_average.append(influence_average_num/self.parameters["NumGraphs"])
+                # Run the simulation
+                result.simulate()
+                # Some stats
+                results_on_r.append(result.graph)
+            # Gives the average spread
+            average_influence = self.R_stats(results_on_r)
+            print(str(seedsetsize) + ": " + str(average_influence))
+            influence_average.append(average_influence)
         self.store(influence_average, "Influence_average")
 
     def gen_graph(self):

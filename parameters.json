@@ -3,19 +3,15 @@
         "Name": "IC",
         "Propagation": 0.01
     },
-    "Heuristics": "Random",
+    "Heuristics": "TIM",
     "Graphs": {
         "Generation": "SF",
-        "Cardinality": 10000,
+        "Cardinality": 15000,
         "Gamma": 1,
-        "Out-degree": 3
+        "Out-degree": 4
     },
-    "R": 20,
-    "NumGraphs": 10,
+    "R": 2000,
     "SeedSetSize": [
-        10,
-        20,
-        30,
         40,
         50
     ],

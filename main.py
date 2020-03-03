@@ -51,8 +51,8 @@ def make_graph_partial_ratio(model, generation, heuristic, partial, partial_meth
 
 
 # run_changing_probabilities()
-# TestSuite()
-make_graph_partial_ratio("IC", "SF", "Random", "Sample-Nodes", "R", [10, 20, 30, 40, 50])
+TestSuite()
+# make_graph_partial_ratio("IC", "SF", "Random", "Sample-Nodes", "R", [10, 20, 30, 40, 50])
 
 # graph_draw(g, output_size=(1000, 1000), output="graph.png")
 
