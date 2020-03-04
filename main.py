@@ -3,23 +3,26 @@ import json
 import plotly.graph_objects as go
 
 
-def run_changing_probabilities(node=True):
+def run_changing_probabilities(node=True, heuristics=None):
+    with open('parameters.json', 'r') as f:
+        data = json.load(f)
+        data["Observable"]["Problem"] = "Partial"
     for i in range(1, 10):
-        with open('parameters.json', 'r+') as f:
-            data = json.load(f)
-            data["Observable"]["Problem"] = "Partial"
-            data["Observable"]["Sample"]["NProbability" if node else "EProbability"] = i/10
-            f.seek(0)
-            json.dump(data, f, indent=4)
-            f.truncate()
-        TestSuite()
+        data["Observable"]["Sample"]["NProbability" if node else "EProbability"] = i/10
+        TestSuite(params_dict=data)
+
+def run_all_heuristics():
+    with open('parameters.json', 'r') as f:
+        data = json.load(f)
+    for i in ["Random", "Degree", "SingleDiscount"]:
+        data["Heuristics"] = i
+        TestSuite(params_dict=data)
 
 def get_json(name):
     with open(name, "r") as f:
         data = json.loads(json.load(f))
         temp = data["Data"]
     return temp
-
 
 def make_graph_partial_ratio(model, generation, heuristic, partial, partial_method, seedsetsize = None):
     observable_name = model + "_" + generation + "_" + heuristic + "_Observable.json"
@@ -51,7 +54,8 @@ def make_graph_partial_ratio(model, generation, heuristic, partial, partial_meth
 
 
 # run_changing_probabilities()
-TestSuite()
+run_all_heuristics()
+# TestSuite()
 # make_graph_partial_ratio("IC", "SF", "Random", "Sample-Nodes", "R", [10, 20, 30, 40, 50])
 
 # graph_draw(g, output_size=(1000, 1000), output="graph.png")

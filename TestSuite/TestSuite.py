@@ -19,10 +19,13 @@ from time import time
 
 class TestSuite:
 
-    def __init__(self, params="parameters.json"):
+    def __init__(self, params="parameters.json", params_dict=None):
         try:
-            with open(params, "r") as fp:
-                self.parameters = json.load(fp)
+            if params_dict is None:
+                with open(params, "r") as fp:
+                    self.parameters = json.load(fp)
+            else:
+                self.parameters = params_dict
         except Exception as e:
             print("error parsing the parameters: \n" + str(e))
             exit(-1)

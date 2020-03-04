@@ -2,6 +2,9 @@ from graph_tool.all import *
 from typing import Callable
 from .Model import Model
 from numpy.random import ranf, randint
+import functools
+from timeit import default_timer as timer
+
 
 class IndependantCascade(Model):
 
@@ -14,11 +17,8 @@ class IndependantCascade(Model):
 
     def _simulate(self) -> Graph:
         g = self.graph
-        # print(g.num_vertices())
-        # print(g.num_edges())
         t = 1
         g_ = GraphView(g, vfilt=lambda v: g.vertex_properties["active"][v] == t)
-        # print("START")
         while g_.num_vertices() != 0:
             for n in g_.vertices():
                 # Go through the neighboors
@@ -30,7 +30,6 @@ class IndependantCascade(Model):
                         g.vertex_properties["active"][n_neighbour] = t + 1
             t += 1
             g_ = GraphView(g, vfilt=lambda v: g.vertex_properties["active"][v] == t)
-        # print("END")
         return g
 
     def _generate_default_graph(self, propagation: float = None) -> None:
