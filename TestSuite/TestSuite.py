@@ -86,7 +86,7 @@ class TestSuite:
     def gen_graph(self):
         # Generate the graph
         if self.parameters["Graphs"]["Generation"] == "R":
-            g = random_graph(self.parameters["Graphs"]["Cardinality"], lambda: normal(50, 2), directed=False)
+            g = random_graph(self.parameters["Graphs"]["Cardinality"], lambda: normal(6, 1), directed=False)
 
             active = g.new_vertex_property("int")
             g.vertex_properties["active"] = active

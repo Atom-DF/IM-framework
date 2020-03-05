@@ -25,7 +25,7 @@ class TIM(Heuristic):
     @staticmethod
     @timer2
     def generate(g: Graph, size: int):
-        epsilon = 0.2
+        epsilon = 1
         l = 1
         n = g.num_vertices()
         lambda_ = (8 + 2 * epsilon)*n * (l*log(n) + log(binom(n, size)) + log(2))*(epsilon**(-2))
@@ -33,7 +33,6 @@ class TIM(Heuristic):
         KTP = TIM.parameter_estimation(g, size, l)
         print(KTP)
         theta = lambda_ / KTP
-        print(theta)
         seed_set = TIM.node_selection(g, size, int(theta))
         return seed_set
 
@@ -76,6 +75,7 @@ class TIM(Heuristic):
     @timer2
     def rr_generation(G: Graph, theta):
         R = set()
+        print(theta)
         for i in range(theta):
             queue = []
             visited = set()
@@ -94,7 +94,6 @@ class TIM(Heuristic):
 
 
     @staticmethod
-    @timer2
     def max_cover(R):
         counter = dict()
         for i in R:
