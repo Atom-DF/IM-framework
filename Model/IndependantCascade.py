@@ -11,10 +11,6 @@ class IndependantCascade(Model):
     def __init__(self, graph: Graph = None, seed_set = None) -> None:
         super(IndependantCascade, self).__init__(graph, seed_set)
 
-        # Default values for generating default graphs
-        self._size = 1000
-        self._density = 0.3
-
     def _simulate(self) -> Graph:
         g = self.graph
         t = 1
@@ -32,22 +28,17 @@ class IndependantCascade(Model):
             g_ = GraphView(g, vfilt=lambda v: g.vertex_properties["active"][v] == t)
         return g
 
-    def _generate_default_graph(self, propagation: float = None) -> None:
-        size = self._size
-        density = self._density
-        # Create the graph
-        g = Graph()
-
-        # Add the vertexes
-        g.add_vertex(size)
-
-        # insert some random links
-        for s, t in zip(randint(0, size, density), randint(0, size, density)):
-            g.add_edge(g.vertex(s), g.vertex(t))
-
-        weight = g.new_edge_property("double", vals= ranf(size) if (propagation is None) else [propagation for i in range(density)])
-        g.edge_properties["weight"] = weight
-
-        active = g.new_vertex_property("int")
-        g.vertex_properties["active"] = active
-        self.graph = g
+    @staticmethod
+    def set_up(g: Graph, params) -> Graph:
+        if not params["Degree_Based"]:
+            weight = g.new_edge_property("double", vals=[params["propagation"]] * len(g.get_edges()))
+            g.edge_properties["weight"] = weight
+        else:
+            weight = g.new_edge_property("double")
+            weight.set_value(1.0)
+            g.edge_properties["weight"] = weight
+            for v in g.vertices():
+                for e in v.out_edges():
+                    g.edge_properties["weight"][e] = 1/v.out_degree() if 1/v.out_degree() < g.edge_properties["weight"][e]\
+                        else g.edge_properties["weight"][e]
+        return g

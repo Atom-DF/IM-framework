@@ -38,6 +38,4 @@ class Model(ABC):
     def _simulate(self):
         raise NotImplementedError
 
-    def _generate_default_graph(self):
-        raise NotImplementedError
 

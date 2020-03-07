@@ -31,7 +31,6 @@ class TIM(Heuristic):
         lambda_ = (8 + 2 * epsilon)*n * (l*log(n) + log(binom(n, size)) + log(2))*(epsilon**(-2))
 
         KTP = TIM.parameter_estimation(g, size, l)
-        print(KTP)
         theta = lambda_ / KTP
         seed_set = TIM.node_selection(g, size, int(theta))
         return seed_set

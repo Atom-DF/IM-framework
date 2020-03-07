@@ -1,16 +1,18 @@
 {
     "Models": {
-        "Name": "IC",
-        "Propagation": 0.01
+        "Name": "LT",
+        "Propagation": 0.01,
+        "Threshold": 0.155,
+        "Degree_Based": true
     },
     "Heuristics": "TIM",
     "Graphs": {
-        "Generation": "R",
+        "Generation": "SF",
         "Cardinality": 1000,
         "Gamma": 1,
         "Out-degree": 3
     },
-    "R": 100,
+    "R": 10,
     "SeedSetSize": [
         40,
         50

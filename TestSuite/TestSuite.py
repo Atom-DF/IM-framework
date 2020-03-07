@@ -9,6 +9,8 @@ from Heuristic.Random import Random
 from Heuristic.DegreePriority import DegreePriority
 from Heuristic.SingleDiscount import SingleDiscount
 from Heuristic.TIM import TIM
+from Graphs.Random import RandomGraph
+from Graphs.ScaleFree import ScaleFreeGraph
 from numpy.random import normal
 from numpy import divide, zeros
 from typing import List, Union
@@ -38,14 +40,14 @@ class TestSuite:
         heuristics = {"Random": Random, "Degree": DegreePriority, "SingleDiscount": SingleDiscount, "TIM": TIM}
 
         try:
-            model = models[self.parameters["Models"]["Name"]]
+            self.model = models[self.parameters["Models"]["Name"]]
         except Exception as e:
             print("Could not find the model in the map: " + self.parameters["Models"]["Name"])
             exit(-1)
 
         try:
             print("using "+self.parameters["Heuristics"])
-            heuristic = heuristics[self.parameters["Heuristics"]]
+            self.heuristic = heuristics[self.parameters["Heuristics"]]
         except Exception as e:
             print("Could not find the heuristic in the map:" + self.parameters["Heuristics"])
             exit(-1)
@@ -66,12 +68,12 @@ class TestSuite:
             graph_copy = graph.copy()
 
             # Run the heuristic on it
-            seed_set = heuristic.generate(graph_copy, seedsetsize)
+            seed_set = self.heuristic.generate(graph_copy, seedsetsize)
             for i in range(self.parameters["R"]):
                 # Use a blank graph, the changes from the heuristic are kept in this version
                 graph_copy_R = graph_copy.copy()
                 # Run the model on the original graph (all changes made by the heuristic are passed onto graph_copy_R)
-                result = model(graph_copy_R, seed_set)
+                result = self.model(graph_copy_R, seed_set)
 
                 # Run the simulation
                 result.simulate()
@@ -84,37 +86,13 @@ class TestSuite:
         self.store(influence_average, "Influence_average")
 
     def gen_graph(self):
-        # Generate the graph
         if self.parameters["Graphs"]["Generation"] == "R":
-            g = random_graph(self.parameters["Graphs"]["Cardinality"], lambda: normal(6, 1), directed=False)
-
-            active = g.new_vertex_property("int")
-            g.vertex_properties["active"] = active
+            generator = RandomGraph(self.parameters["Graphs"]["Cardinality"])
+            g = generator.generate()
         elif self.parameters["Graphs"]["Generation"] == "SF":
-            # Barabási–Albert model
-            g = price_network(self.parameters["Graphs"]["Cardinality"], gamma=self.parameters["Graphs"]["Gamma"], m=self.parameters["Graphs"]["Out-degree"], directed=False)
-
-            active = g.new_vertex_property("int")
-            g.vertex_properties["active"] = active
-
-        else:
-            print("error generating graph, graph generation not known")
-            exit(-1)
-
-        # Generate Model
-        if "IC" == self.parameters["Models"]["Name"]:
-            weight = g.new_edge_property("double", vals=[self.parameters["Models"]["Propagation"]]* len(g.get_edges()))
-            g.edge_properties["weight"] = weight
-        elif "LT" == self.parameters["Models"]["Name"]:
-            weight = g.new_edge_property("double", vals=ranf(len(g.get_edges())))
-            g.edge_properties["weight"] = weight
-
-            threshold = g.new_vertex_property("double", vals=[self.parameters["Models"]["Threshold"]]* len(g.get_vertices()))
-            g.vertex_properties["threshold"] = threshold
-        else:
-            print("error generating graph, heuristic generation not known")
-            exit(-1)
-
+            generator = ScaleFreeGraph(self.parameters["Graphs"]["Cardinality"], self.parameters["Graphs"]["Gamma"], self.parameters["Graphs"]["Out-degree"])
+            g = generator.generate()
+        self.model.set_up(g, self.parameters["Models"])
         return g
 
     def model_PO(self, graph: Graph) -> Union[Graph, GraphView]:
