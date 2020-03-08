@@ -2,7 +2,7 @@
     "Models": {
         "Name": "IC",
         "Propagation": 0.01,
-        "Degree_Based": false
+        "Degree_Based": true
     },
     "Heuristics": "TIM",
     "Graphs": {

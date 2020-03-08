@@ -40,7 +40,7 @@ class LinearThreshold(Model):
         weight.set_value(1.0)
         g.edge_properties["weight"] = weight
 
-        threshold = g.new_vertex_property("double", vals=[params["Threshold"]] * len(g.get_vertices()))
+        threshold = g.new_vertex_property("double", vals=ranf(len(g.get_vertices())))
         g.vertex_properties["threshold"] = threshold
 
         for v in g.vertices():

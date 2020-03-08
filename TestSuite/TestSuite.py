@@ -21,7 +21,7 @@ from time import time
 
 class TestSuite:
 
-    def __init__(self, params="parameters.json", params_dict=None):
+    def __init__(self, params="parameters.json", params_dict=None, graph_name=None):
         try:
             if params_dict is None:
                 with open(params, "r") as fp:
@@ -53,7 +53,11 @@ class TestSuite:
             exit(-1)
 
         # Get the initial graph
-        self.graph = self.gen_graph()
+        if graph_name is None:
+            self.graph = self.gen_graph()
+            self.graph.save("graph.xml.gz")
+        else:
+            self.graph = load_graph(graph_name)
 
         # Model Partial Obversability
         graph = self.model_PO(self.graph.copy())
@@ -123,9 +127,9 @@ class TestSuite:
         return sum(xs[1:])
 
     def store(self, data, name):
-        json_data = json.dumps({"Data":list(data)})
+        json_data = json.dumps({"Data": list(data)})
         # Model used, graph generation
-        title = self.parameters["Models"]["Name"] + "_" + self.parameters["Graphs"]["Generation"] + "_" + self.parameters["Heuristics"] + "_"
+        title = self.parameters["Models"]["Name"]+ str(self.parameters["Models"]["Degree_Based"]) + "_" + self.parameters["Graphs"]["Generation"] + "_" + self.parameters["Heuristics"] + "_"
         if self.parameters["Observable"]["Problem"] == "Total":
             title += "Observable"
         elif self.parameters["Observable"]["Sample"]["Nodes"] == "Random":
