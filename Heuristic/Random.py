@@ -9,7 +9,8 @@ class Random(Heuristic):
     @staticmethod
     def generate(g: Graph, size: int):
         s = []
-        for v in choice(range(len(list(g.vertices()))), size):
+        g_ = GraphView(g, vfilt=lambda v: g.vertex_properties["active"][v] == 0)
+        for v in choice(range(len(list(g_.vertices()))), size):
             s.append(g.vertex(v, use_index=False))
         return s
 

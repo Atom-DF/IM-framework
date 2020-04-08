@@ -9,11 +9,11 @@ class Model(ABC):
         self._seed_set = seed_set
 
     @property
-    def seed_set(self) -> Graph:
+    def seed_set(self) -> List[int]:
         return self._seed_set
 
     @seed_set.setter
-    def seed_set(self, value: List):
+    def seed_set(self, value: List[int]):
         self._graph = value
 
     @property
@@ -29,13 +29,14 @@ class Model(ABC):
             raise Exception("Graph is not defined")
         elif self.seed_set is None:
             raise Exception("Seed set is not defined")
+        value = max(self.graph.get_vertices()) + 1
         for v in self.seed_set:
-            self.graph.vertex_properties["active"][v] = 1
+            self.graph.vertex_properties["active"][v] = value
 
-        self._simulate()
+        self._simulate(value)
 
     @abstractmethod
-    def _simulate(self):
+    def _simulate(self, t):
         raise NotImplementedError
 
 

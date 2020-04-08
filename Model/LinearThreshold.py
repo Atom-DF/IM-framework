@@ -10,9 +10,8 @@ class LinearThreshold(Model):
     def __init__(self, graph: Graph = None, seed_set = None) -> None:
         super(LinearThreshold, self).__init__(graph, seed_set)
 
-    def _simulate(self) -> Graph:
+    def _simulate(self, t) -> Graph:
         g = self.graph
-        t = 1
         g_ = GraphView(g, vfilt=lambda v: g.vertex_properties["active"][v] == t)
         while g_.num_vertices() != 0:
             for n in g_.vertices():

@@ -11,9 +11,8 @@ class IndependantCascade(Model):
     def __init__(self, graph: Graph = None, seed_set = None) -> None:
         super(IndependantCascade, self).__init__(graph, seed_set)
 
-    def _simulate(self) -> Graph:
+    def _simulate(self, t) -> Graph:
         g = self.graph
-        t = 1
         g_ = GraphView(g, vfilt=lambda v: g.vertex_properties["active"][v] == t)
         while g_.num_vertices() != 0:
             for n in g_.vertices():
@@ -31,7 +30,7 @@ class IndependantCascade(Model):
     @staticmethod
     def set_up(g: Graph, params) -> Graph:
         if not params["Degree_Based"]:
-            weight = g.new_edge_property("double", vals=[params["propagation"]] * len(g.get_edges()))
+            weight = g.new_edge_property("double", vals=[params["Propagation"]] * len(g.get_edges()))
             g.edge_properties["weight"] = weight
         else:
             weight = g.new_edge_property("double")
