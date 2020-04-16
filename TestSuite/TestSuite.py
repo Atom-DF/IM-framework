@@ -1,4 +1,5 @@
 import json
+import os
 from graph_tool.all import *
 from numpy.random import ranf, randint
 from Model.Model import Model
@@ -8,6 +9,7 @@ from Heuristic.Heuristic import Heuristic
 from Heuristic.Random import Random
 from Heuristic.DegreePriority import DegreePriority
 from Heuristic.SingleDiscount import SingleDiscount
+from Heuristic.DegreeDiscount import DegreeDiscount
 from Heuristic.TIM import TIM
 from Graphs.Random import RandomGraph
 from Graphs.ScaleFree import ScaleFreeGraph
@@ -21,7 +23,7 @@ from time import time
 
 class TestSuite:
 
-    def __init__(self, params="parameters.json", params_dict=None, graph_name=None):
+    def __init__(self, params="parameters.json", params_dict=None, graph_name=None, save=False):
         try:
             if params_dict is None:
                 with open(params, "r") as fp:
@@ -31,12 +33,12 @@ class TestSuite:
         except Exception as e:
             print("error parsing the parameters: \n" + str(e))
             exit(-1)
-
+        self.save = save
         self.pre_influence(graph_name)
 
     def pre_influence(self, graph_name=None):
         models = {"IC": IndependantCascade, "LT": LinearThreshold}
-        heuristics = {"Random": Random, "Degree": DegreePriority, "SingleDiscount": SingleDiscount, "TIM": TIM}
+        heuristics = {"Random": Random, "Degree": DegreePriority, "SingleDiscount": SingleDiscount,"DegreeDiscount": DegreeDiscount, "TIM": TIM}
 
         try:
             self.model = models[self.parameters["Models"]["Name"]]
@@ -52,15 +54,16 @@ class TestSuite:
             exit(-1)
 
         # Get the initial graph
-        if graph_name is None:
+        if graph_name is None or self.save:
             self.graph = self.gen_graph()
             # Model Partial Obversability
             self.graph_modeled = self.model_PO(self.graph.copy())
+            if not self.save:
+                self.run_influence()
         else:
             self.graph = load_graph(graph_name + ".xml.gz")
             self.graph_modeled = load_graph(graph_name + "_modeled.xml.gz")
-
-        self.run_influence()
+            self.run_influence()
 
     def run_influence(self):
         # used for stats
@@ -84,7 +87,7 @@ class TestSuite:
             print(str(seedsetsize) + ": " + str(average_influence))
 
             influence_average.append(average_influence)
-        self.store(influence_average, "Influence_average")
+        self.store(influence_average)
 
     def heuristic_split(self, seedsetsize):
         multiple_runs = self.parameters["Observable"]["Multiple_Runs"]
@@ -150,10 +153,11 @@ class TestSuite:
 
     def model_PO(self, graph: Graph) -> Union[Graph, GraphView]:
         graph_copy = graph
-        if self.parameters["Save"]:
+        if self.save:
             self.graph.save("graph.xml.gz")
             graph_copy.save("graph_modeled.xml.gz")
-            exit(1)
+            print("stored graph and modeled graph")
+            return graph
         if self.parameters["Observable"]["Problem"] == "Total":
             return graph_copy
         elif self.parameters["Observable"]["Problem"] == "Partial":
@@ -179,17 +183,13 @@ class TestSuite:
         # Return the number of influenced nodes
         return sum(xs[1:])
 
-    def store(self, data, name):
-        json_data = json.dumps({"Data": list(data)})
-        # Model used, graph generation
-        title = self.parameters["Models"]["Name"]+ str(self.parameters["Models"]["Degree_Based"]) + "_" + \
-                self.parameters["Graphs"]["Generation"] + "_NRun" + str(self.parameters["Observable"]["Multiple_Runs"]) + \
-                "_" + self.parameters["Heuristics"] + "_"
-        if self.parameters["Observable"]["Problem"] == "Total":
-            title += "Observable"
-        elif self.parameters["Observable"]["Sample"]["Nodes"] == "Random":
-            title += "Sample-Nodes-R-" + str(self.parameters["Observable"]["Sample"]["NProbability"])
-        elif self.parameters["Observable"]["Sample"]["Edges"] == "Random":
-            title += "Sample-Edges-R-" + str(self.parameters["Observable"]["Sample"]["EProbability"])
-        with open(title + ".json", "w") as f:
-            json.dump(json_data, f)
+    def store(self, data):
+        if os.path.isfile(self.parameters["Filename"]) and os.access(self.parameters["Filename"], os.R_OK):
+            with open(self.parameters["Filename"], "r") as f:
+                temp = json.load(f)
+                temp.append([{"Parameters": self.parameters}, {"Data": list(data)}])
+            with open(self.parameters["Filename"], "w") as f:
+                json.dump(temp, f)
+        else:
+            with open(self.parameters["Filename"], "w") as f:
+                json.dump([[{"Parameters": self.parameters}, {"Data": list(data)}]], f)

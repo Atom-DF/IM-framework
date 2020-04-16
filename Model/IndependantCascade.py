@@ -20,7 +20,7 @@ class IndependantCascade(Model):
                 v = g.vertex(n)
                 for e_neighbour, n_neighbour in zip(v.out_edges(), v.out_neighbors()):
                     # Check if the node is activated and make sure not to give it a second life
-                    if g.edge_properties["weight"][e_neighbour] > ranf(1) \
+                    if g.edge_properties["weight"][e_neighbour] >= ranf(1) \
                             and g.vertex_properties["active"][n_neighbour] == 0:
                         g.vertex_properties["active"][n_neighbour] = t + 1
             t += 1

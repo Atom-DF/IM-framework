@@ -1,9 +1,10 @@
 from TestSuite.TestSuite import TestSuite
 import json
 import plotly.graph_objects as go
+from multiprocessing import Process
 
 
-def run_changing_probabilities(node=True, heuristics=None, graph_name=None, parameters=None):
+def run_changing_probabilities(node=True, heuristics="Random", parameters="parameters.json"):
     with open(parameters, 'r') as f:
         data = json.load(f)
         data["Observable"]["Problem"] = "Partial"
@@ -12,18 +13,21 @@ def run_changing_probabilities(node=True, heuristics=None, graph_name=None, para
         data["Observable"]["Sample"]["NProbability" if node else "EProbability"] = i/10
         TestSuite(params_dict=data)
 
-def run_all_heuristics(graph_name=None, parameters=None):
+
+def run_all_heuristics(graph_name="graph", parameters="parameters.json", heuristics=["Random", "Degree", "SingleDiscount", "DegreeDiscount", "TIM"]):
     with open(parameters, 'r') as f:
         data = json.load(f)
-    for i in ["Random", "Degree", "SingleDiscount", "TIM"]:
+    for i in heuristics:
         data["Heuristics"] = i
         TestSuite(params_dict=data, graph_name=graph_name)
+
 
 def get_json(name):
     with open(name, "r") as f:
         data = json.loads(json.load(f))
         temp = data["Data"]
     return temp
+
 
 def make_graph_partial_ratio(model, degree_based, generation, heuristic, partial, partial_method, seedsetsize = None):
     observable_name = "data/"+model+degree_based + "_" + generation + "_" + heuristic + "_Observable.json"
@@ -52,6 +56,7 @@ def make_graph_partial_ratio(model, degree_based, generation, heuristic, partial
         )
     )
     fig.show()
+
 
 def make_graph_partial_ratio2(model, degree_based, generation, heuristic, partial, partial_method, seedsetsize = None):
     observable_name = "data/"+model + degree_based + "_" + generation + "_" + heuristic + "_Observable.json"
@@ -86,7 +91,7 @@ def make_graph_partial_ratio2(model, degree_based, generation, heuristic, partia
 
 def make_graph_observable(model, degree_based, generation):
     observables = []
-    for i in ["Random", "Degree", "SingleDiscount", "TIM"]:
+    for i in ["Random", "Degree", "SingleDiscount", "DegreeDiscount", "TIM"]:
         observables.append(get_json("data/" + model + degree_based + "_" + generation + "_" + i + "_Observable.json"))
     x = list(range(1, 51))
 
@@ -106,8 +111,77 @@ def make_graph_observable(model, degree_based, generation):
     )
     fig.show()
 
-# 1
-TestSuite()
 
+def test(model, degree_based, generation):
+    observables = []
+    for i in [1, 2, 3, 4]:
+        observables.append(get_json(model + degree_based + "_" + generation + "_" + "NRun"+str(i)+"_" + "DegreeDiscount" + "_Observable.json"))
+    x = [10]
+
+    fig = go.Figure()
+
+    for index, i in enumerate([1, 2, 3, 4]):
+        fig.add_trace(go.Scatter(x=x, y=observables[index], mode="markers", name=i))
+    fig.update_layout(
+        title="Influence Maximization under "+model+" " + ("Degree Based" if degree_based == "True" else "Constant Based"),
+        xaxis_title="Seed Set Size",
+        yaxis_title="Average Spread",
+        font=dict(
+            family="Courier New, monospace",
+            size=14,
+            color="#7f7f7f"
+        )
+    )
+    fig.show()
+
+
+def experiment1():
+    def run_simulation():
+        TestSuite(params_dict=params, graph_name="graph")
+
+    with open("parameters.json", "r") as fp:
+        params = json.load(fp)
+
+    params["Filename"] = "Experiment1.json"
+    params["Models"]["Degree_Based"] = False
+    params["SeedSetSize"] = [50]
+
+    TestSuite(graph_name="graph", save=True, params_dict=params)
+
+    processes = []
+    for i in ["Random", "Degree", "SingleDiscount", "DegreeDiscount", "TIM"]:
+        params["Heuristics"] = i
+        temp = Process(target=run_simulation)
+        temp.start()
+        processes.append(temp)
+
+    for i in processes:
+        i.join()
+
+    params["Models"]["Degree_Based"] = True
+
+    processes = []
+    for i in ["Random", "Degree", "SingleDiscount", "DegreeDiscount", "TIM"]:
+        params["Heuristics"] = i
+        temp = Process(target=run_simulation)
+        temp.start()
+        processes.append(temp)
+
+    for i in processes:
+        i.join()
+
+
+def analyse_experiment1():
+    pass
+
+
+
+
+# 1
+# TestSuite(graph_name="graph", save=True)
+experiment1()
 # 2 et 3
-# run_all_heuristics("graph", "parameters.json")
+# run_changing_probabilities(heuristics="DegreeDiscount")
+# run_all_heuristics(heuristics=["Random", "Degree", "SingleDiscount", "DegreeDiscount"])
+
+# test("IC", "False", "SF")

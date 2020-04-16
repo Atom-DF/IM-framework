@@ -23,7 +23,7 @@ def timer2(func):
 class TIM(Heuristic):
 
     @staticmethod
-    @timer2
+    # @timer2
     def generate(g: Graph, size: int):
         epsilon = 1
         l = 1
@@ -32,11 +32,14 @@ class TIM(Heuristic):
 
         KTP = TIM.parameter_estimation(g, size, l)
         theta = lambda_ / KTP
+        # shouldn't need to generate that many tbf
+        if theta == float('inf'):
+            theta = 1000000
         seed_set = TIM.node_selection(g, size, int(theta))
         return seed_set
 
     @staticmethod
-    @timer2
+    # @timer2
     def parameter_estimation(G, k, l):
         # @timer2
         def K(R):
@@ -59,7 +62,7 @@ class TIM(Heuristic):
 
 
     @staticmethod
-    @timer2
+    # @timer2
     def node_selection(G, k, theta):
         # generate theta random RR sets and insert them in R
         R = TIM.rr_generation(G, theta)
@@ -71,16 +74,17 @@ class TIM(Heuristic):
         return S
 
     @staticmethod
-    @timer2
+    # @timer2
     def rr_generation(G: Graph, theta):
         R = set()
-        print(theta)
+        # print(theta)
         for i in range(theta):
             queue = []
             visited = set()
             v = randint(G.num_vertices())
-            visited.add(G.vertex(v, use_index=False))
-            queue.append(G.vertex(v, use_index=False))
+            temp = G.vertex(v, use_index=False)
+            visited.add(temp)
+            queue.append(temp)
             while len(queue) != 0:
                 curr = queue.pop(0)
                 # This TIM verion only works for un directed graphs
