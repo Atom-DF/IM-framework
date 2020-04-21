@@ -34,7 +34,7 @@ class TIM(Heuristic):
         theta = lambda_ / KTP
         # shouldn't need to generate that many tbf
         if theta == float('inf'):
-            theta = 1000000
+            theta = 5000000
         seed_set = TIM.node_selection(g, size, int(theta))
         return seed_set
 
@@ -59,7 +59,6 @@ class TIM(Heuristic):
             if sum_/c > 1/(2**i):
                 return n*sum_/(2*c)
         return 1
-
 
     @staticmethod
     # @timer2
@@ -95,7 +94,6 @@ class TIM(Heuristic):
             R.add(tuple(visited))
         return R
 
-
     @staticmethod
     def max_cover(R):
         counter = dict()
@@ -103,13 +101,3 @@ class TIM(Heuristic):
             for j in i:
                 counter[j] = counter.get(j, 0) + 1
         return max(counter.items(), key=(lambda key: key[1]))[0]
-
-
-
-
-
-
-
-
-
-

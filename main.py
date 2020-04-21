@@ -28,6 +28,10 @@ def get_json(name):
         temp = data["Data"]
     return temp
 
+def get_json2(name):
+    with open(name, "r") as f:
+        temp = json.load(f)
+    return temp
 
 def make_graph_partial_ratio(model, degree_based, generation, heuristic, partial, partial_method, seedsetsize = None):
     observable_name = "data/"+model+degree_based + "_" + generation + "_" + heuristic + "_Observable.json"
@@ -144,7 +148,6 @@ def experiment1():
 
     params["Filename"] = "Experiment1.json"
     params["Models"]["Degree_Based"] = False
-    params["SeedSetSize"] = [50]
 
     TestSuite(graph_name="graph", save=True, params_dict=params)
 
@@ -172,16 +175,101 @@ def experiment1():
 
 
 def analyse_experiment1():
-    pass
+    observables = []
+    experiment = get_json2("Experiment1.json")
+
+    x = experiment[0][0]["Parameters"]["SeedSetSize"]
+
+    observables.append(("Random", experiment[0][1]["Data"]))
+    observables.append(("Degree", experiment[1][1]["Data"]))
+    observables.append(("TIM", experiment[2][1]["Data"]))
+    observables.append(("DegreeDiscount", experiment[3][1]["Data"]))
+    observables.append(("SingleDiscount", experiment[4][1]["Data"]))
 
 
+    fig = go.Figure()
+
+    for index, i in observables:
+        fig.add_trace(go.Scatter(x=x, y=i, mode="lines", name=index))
+    fig.update_layout(
+        title="Influence Maximization under IC Constant Based",
+        xaxis_title="Seed Set Size",
+        yaxis_title="Average Spread",
+        font=dict(
+            family="Courier New, monospace",
+            size=14,
+            color="#7f7f7f"
+        )
+    )
+    fig.show()
+
+    observables = []
+    experiment = get_json2("Experiment1.json")
+
+    x = experiment[0][0]["Parameters"]["SeedSetSize"]
+
+    observables.append(("Random", experiment[5][1]["Data"]))
+    observables.append(("Degree", experiment[6][1]["Data"]))
+    observables.append(("TIM", experiment[7][1]["Data"]))
+    observables.append(("DegreeDiscount", experiment[8][1]["Data"]))
+    observables.append(("SingleDiscount", experiment[9][1]["Data"]))
+
+    fig = go.Figure()
+
+    for index, i in observables:
+        fig.add_trace(go.Scatter(x=x, y=i, mode="lines", name=index))
+    fig.update_layout(
+        title="Influence Maximization under IC Degree Based",
+        xaxis_title="Seed Set Size",
+        yaxis_title="Average Spread",
+        font=dict(
+            family="Courier New, monospace",
+            size=14,
+            color="#7f7f7f"
+        )
+    )
+    fig.show()
+
+def experiment1_():
+    def run_simulation():
+        TestSuite(params_dict=params, graph_name="graph")
+
+    with open("parameters.json", "r") as fp:
+        params = json.load(fp)
+
+    params["Filename"] = "Experiment1.json"
+    params["Models"]["Degree_Based"] = False
+
+    TestSuite(graph_name="graph", save=True, params_dict=params)
+
+    processes = []
+    for i in ["Random", "Degree", "SingleDiscount", "DegreeDiscount", "TIM"]:
+        params["Heuristics"] = i
+        temp = Process(target=run_simulation)
+        temp.start()
+        processes.append(temp)
+
+    for i in processes:
+        i.join()
+
+    params["Models"]["Degree_Based"] = True
+
+    processes = []
+    for i in ["Random", "Degree", "SingleDiscount", "DegreeDiscount", "TIM"]:
+        params["Heuristics"] = i
+        temp = Process(target=run_simulation)
+        temp.start()
+        processes.append(temp)
+
+    for i in processes:
+        i.join()
 
 
 # 1
 # TestSuite(graph_name="graph", save=True)
-experiment1()
+# analyse_experiment1()
 # 2 et 3
 # run_changing_probabilities(heuristics="DegreeDiscount")
 # run_all_heuristics(heuristics=["Random", "Degree", "SingleDiscount", "DegreeDiscount"])
-
+experiment1_()
 # test("IC", "False", "SF")
