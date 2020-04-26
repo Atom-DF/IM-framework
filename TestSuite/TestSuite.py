@@ -1,5 +1,6 @@
 import json
 import os
+from timeit import default_timer
 from graph_tool.all import *
 from numpy.random import ranf, randint
 from Model.Model import Model
@@ -34,6 +35,7 @@ class TestSuite:
             print("error parsing the parameters: \n" + str(e))
             exit(-1)
         self.save = save
+        self.running_time = default_timer()
         self.pre_influence(graph_name)
 
     def pre_influence(self, graph_name=None):
@@ -87,6 +89,7 @@ class TestSuite:
             print(str(seedsetsize) + ": " + str(average_influence))
 
             influence_average.append(average_influence)
+        self.running_time = default_timer() - self.running_time
         self.store(influence_average)
 
     def heuristic_split(self, seedsetsize):
@@ -187,9 +190,9 @@ class TestSuite:
         if os.path.isfile(self.parameters["Filename"]) and os.access(self.parameters["Filename"], os.R_OK):
             with open(self.parameters["Filename"], "r") as f:
                 temp = json.load(f)
-                temp.append([{"Parameters": self.parameters}, {"Data": list(data)}])
+                temp.append([{"Parameters": self.parameters}, {"Running_Time": self.running_time}, {"Data": list(data)}])
             with open(self.parameters["Filename"], "w") as f:
                 json.dump(temp, f)
         else:
             with open(self.parameters["Filename"], "w") as f:
-                json.dump([[{"Parameters": self.parameters}, {"Data": list(data)}]], f)
+                json.dump([[{"Parameters": self.parameters}, {"Running_Time": self.running_time}, {"Data": list(data)}]], f)

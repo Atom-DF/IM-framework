@@ -23,10 +23,10 @@ def timer2(func):
 class TIM(Heuristic):
 
     @staticmethod
-    # @timer2
+    @timer2
     def generate(g: Graph, size: int):
-        epsilon = 1
-        l = 1
+        epsilon = 0.1
+        l = 2
         n = g.num_vertices()
         lambda_ = (8 + 2 * epsilon)*n * (l*log(n) + log(binom(n, size)) + log(2))*(epsilon**(-2))
 
@@ -39,7 +39,7 @@ class TIM(Heuristic):
         return seed_set
 
     @staticmethod
-    # @timer2
+    @timer2
     def parameter_estimation(G, k, l):
         # @timer2
         def K(R):
@@ -61,7 +61,7 @@ class TIM(Heuristic):
         return 1
 
     @staticmethod
-    # @timer2
+    @timer2
     def node_selection(G, k, theta):
         # generate theta random RR sets and insert them in R
         R = TIM.rr_generation(G, theta)
@@ -73,11 +73,13 @@ class TIM(Heuristic):
         return S
 
     @staticmethod
-    # @timer2
+    @timer2
     def rr_generation(G: Graph, theta):
         R = set()
-        # print(theta)
+        print(theta)
         for i in range(theta):
+            if i % 1000 == 0:
+                print(i/theta*100)
             queue = []
             visited = set()
             v = randint(G.num_vertices())

@@ -173,7 +173,6 @@ def experiment1():
     for i in processes:
         i.join()
 
-
 def analyse_experiment1():
     observables = []
     experiment = get_json2("Experiment1.json")
@@ -237,7 +236,7 @@ def experiment1_():
     with open("parameters.json", "r") as fp:
         params = json.load(fp)
 
-    params["Filename"] = "Experiment1.json"
+    params["Filename"] = "Experiment1_.json"
     params["Models"]["Degree_Based"] = False
 
     TestSuite(graph_name="graph", save=True, params_dict=params)
@@ -264,6 +263,40 @@ def experiment1_():
     for i in processes:
         i.join()
 
+def experiment2():
+    def run_simulation():
+        TestSuite(params_dict=params, graph_name="graph")
+
+    with open("parameters.json", "r") as fp:
+        params = json.load(fp)
+
+    params["Filename"] = "Experiment2.json"
+    params["Models"]["Degree_Based"] = False
+
+    TestSuite(graph_name="graph", save=True, params_dict=params)
+
+    processes = []
+    for i in ["Random", "Degree", "SingleDiscount", "DegreeDiscount"]:
+        params["Heuristics"] = i
+        temp = Process(target=run_simulation)
+        temp.start()
+        processes.append(temp)
+
+    for i in processes:
+        i.join()
+
+    params["Models"]["Degree_Based"] = True
+
+    processes = []
+    for i in ["Random", "Degree", "SingleDiscount", "DegreeDiscount"]:
+        params["Heuristics"] = i
+        temp = Process(target=run_simulation)
+        temp.start()
+        processes.append(temp)
+
+    for i in processes:
+        i.join()
+
 
 # 1
 # TestSuite(graph_name="graph", save=True)
@@ -271,5 +304,9 @@ def experiment1_():
 # 2 et 3
 # run_changing_probabilities(heuristics="DegreeDiscount")
 # run_all_heuristics(heuristics=["Random", "Degree", "SingleDiscount", "DegreeDiscount"])
-experiment1_()
-# test("IC", "False", "SF")
+# experiment1_()
+
+# TestSuite(save=True)
+TestSuite(graph_name="graph")
+
+# test("IC", "False", "SF") 20: 129.08999999999995 4000 seconds
