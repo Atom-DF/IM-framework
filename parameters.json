@@ -60,7 +60,7 @@
         ],
     "Observable": {
         "Problem": "Total",
-        "Multiple_Runs": 5,
+        "Multiple_Runs": 4,
         "Sample": {
             "Nodes": "Random",
             "NProbability": 0.8,

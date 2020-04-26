@@ -273,7 +273,7 @@ def experiment2():
     params["Filename"] = "Experiment2.json"
     params["Models"]["Degree_Based"] = False
 
-    TestSuite(graph_name="graph", save=True, params_dict=params)
+    # TestSuite(graph_name="graph", save=True, params_dict=params)
 
     processes = []
     for i in ["Random", "Degree", "SingleDiscount", "DegreeDiscount"]:

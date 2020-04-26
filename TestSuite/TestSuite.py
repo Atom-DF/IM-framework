@@ -64,7 +64,7 @@ class TestSuite:
                 self.run_influence()
         else:
             self.graph = load_graph(graph_name + ".xml.gz")
-            self.graph_modeled = load_graph(graph_name + "_modeled.xml.gz")
+            self.graph_modeled = self.model_PO(self.graph.copy())
             self.run_influence()
 
     def run_influence(self):
@@ -158,7 +158,6 @@ class TestSuite:
         graph_copy = graph
         if self.save:
             self.graph.save("graph.xml.gz")
-            graph_copy.save("graph_modeled.xml.gz")
             print("stored graph and modeled graph")
             return graph
         if self.parameters["Observable"]["Problem"] == "Total":
