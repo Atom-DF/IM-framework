@@ -74,8 +74,9 @@ class TestSuite:
             results_on_r = []
             if self.parameters["Observable"]["Multiple_Runs"] == 1:
                 # Run the heuristic on it
+                temp1 = default_timer()
                 seed_set = self.heuristic.generate(self.graph_modeled.copy(), seedsetsize)
-
+                print(default_timer() - temp1)
                 # Run R times to make sure it is right !
                 results_on_r = self.run_on_R(self.graph, seed_set)
             else:

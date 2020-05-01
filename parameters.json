@@ -4,14 +4,14 @@
         "Propagation": 0.01,
         "Degree_Based": false
     },
-    "Heuristics": "Degree",
+    "Heuristics": "Random",
     "Graphs": {
         "Generation": "SF",
         "Cardinality": 15000,
         "Gamma": 1,
         "Out-degree": 3
     },
-    "R": 200,
+    "R": 150,
     "SeedSetSize": [
           1,
           3,

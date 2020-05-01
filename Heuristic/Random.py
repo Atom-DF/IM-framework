@@ -13,5 +13,3 @@ class Random(Heuristic):
         for v in choice(range(len(list(g_.vertices()))), size):
             s.append(g.vertex(v, use_index=False))
         return s
-
-

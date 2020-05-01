@@ -78,10 +78,9 @@ class TIM(Heuristic):
         R = set()
         print(theta)
         for i in range(theta):
-            if i % 1000 == 0:
-                print(i/theta*100)
             queue = []
             visited = set()
+
             v = randint(G.num_vertices())
             temp = G.vertex(v, use_index=False)
             visited.add(temp)

@@ -297,16 +297,55 @@ def experiment2():
     for i in processes:
         i.join()
 
+def experiment3():
+    def run_simulation():
+        TestSuite(params_dict=params, graph_name="graph")
 
-# 1
-# TestSuite(graph_name="graph", save=True)
-# analyse_experiment1()
-# 2 et 3
-# run_changing_probabilities(heuristics="DegreeDiscount")
-# run_all_heuristics(heuristics=["Random", "Degree", "SingleDiscount", "DegreeDiscount"])
-# experiment1_()
+    with open("parameters.json", "r") as fp:
+        params = json.load(fp)
 
-# TestSuite(save=True)
-TestSuite(graph_name="graph")
+    params["Filename"] = "Experiment3.json"
+    params["Models"]["Degree_Based"] = False
+    params["Observable"]["Problem"] = "Partial"
+    params["Observable"]["Sample"]["Nodes"] = "Random"
+    # TestSuite(graph_name="graph", save=True, params_dict=params)
 
-# test("IC", "False", "SF") 20: 129.08999999999995 4000 seconds
+    processes = []
+    for j in range(0.1, 1, 0.1):
+        params["Observable"]["Sample"]["NProbability"] = j
+        for a in ["Random", "Degree", "SingleDiscount", "DegreeDiscount"]:
+            params["Heuristics"] = a
+            temp = Process(target=run_simulation)
+            temp.start()
+            processes.append(temp)
+
+        for i in processes:
+            i.join()
+
+def experiemnt4():
+    def run_simulation():
+        TestSuite(params_dict=params, graph_name="graph")
+
+    with open("parameters.json", "r") as fp:
+        params = json.load(fp)
+
+    params["Filename"] = "Experiment3.json"
+    params["Models"]["Degree_Based"] = False
+    params["Observable"]["Problem"] = "Partial"
+    params["Observable"]["Sample"]["Edges"] = "Random"
+    params["Observable"]["Sample"]["Nodes"] = "Total"
+    # TestSuite(graph_name="graph", save=True, params_dict=params)
+
+    processes = []
+    for j in range(0.1, 1, 0.1):
+        params["Observable"]["Sample"]["NProbability"] = j
+        for a in ["Random", "Degree", "SingleDiscount", "DegreeDiscount"]:
+            params["Heuristics"] = a
+            temp = Process(target=run_simulation)
+            temp.start()
+            processes.append(temp)
+
+        for i in processes:
+            i.join()
+
+experiment3()
